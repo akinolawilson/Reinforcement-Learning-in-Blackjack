@@ -16,7 +16,8 @@ def agentTraining(noOfDecks,
     
     gamePlay = Dealing(noOfDecks)
     gamePlay.newRound()
-    gamePlay.score()
+    
+
 
     agent = adp(deckSize,
                 gamePlay.deck,
@@ -25,22 +26,20 @@ def agentTraining(noOfDecks,
                 gamePlay.dealerScore,
                 gamePlay.aceCount,
                 gamePlay.aceCriticalHit,
-                gamma)
-    
+                gamePlay.objective,
+                gamma)        
+
+
     if qTable !=None:              #
-        adp.QList.append(qTable)   # QList is class variable of adp
+        agent.QList.append(qTable)   # QList is class variable of adp
                                    #
- 
-    for i in range(sampleSpaceSearching + sampleSpaceExploitation):
-        
-
-            
-
+    objectiveScore = []                                   
+    for trajectoryNumber in range(sampleSpaceSearching + sampleSpaceExploitation):
             
             exploredStateAction = []
             while gamePlay.ifGameEnd() == False:    
                 
-                if i < sampleSpaceSearching:
+                if trajectoryNumber < sampleSpaceSearching:
                    
                    e = 100 / (100+len(exploredStateAction)) # as explore more, more likely to
                                                             # stick to optimal policy
@@ -73,18 +72,10 @@ def agentTraining(noOfDecks,
                 if stateAction not in adp.QList and (agent.score >= gamePlay.dealerScore
                     and agent.score <= gamePlay.blackJack):
                         
-                        exploredStateAction.append((deckSize,
-                                                   agent.remainingDeckSize,
-                                                   gamePlay.hitScore,
-                                                   agent.dealerScore,
-                                                   gamePlay.dealerScore,
-                                                   agent.aceCount,
-                                                   agent.aces,
-                                                   gamePlay.actionOutcome(action),
-                                                   action))
+                        exploredStateAction.append(stateAction)
                    
-                adp.QList.append(exploredStateAction)
-            
+                agent.QList.append(exploredStateAction)
+                
                 reward = gamePlay.actionOutcome(action)
                     
                 if reward>=1:
@@ -96,11 +87,14 @@ def agentTraining(noOfDecks,
                                     
             if gamePlay.ifGameEnd() == True:
                 
+                agent.QList.append((agent.objective))
+                 #  objectiveScore.append(gamePlay.objectiveScore)
+                
                 if i < sampleSpaceSearching:
                     
-                    adp.QTableUpdate(method,
-                                     reward,
-                                     gamma)
+                    agent.QTableUpdate(method,
+                                       reward,
+                                       gamma)
                     
         # counting wins, draws and lost games 
 
@@ -108,7 +102,7 @@ def agentTraining(noOfDecks,
                 
                 
     print("After training for {} iterations of {} deck(s) using "
-          " policy search method: {}".format(sampleSpaceSearching,deckSize,method)) 
+          " policy search method: {}".format(sampleSpaceSearching,gamePlay.deckSize,method)) 
     
     print("The agent plays for {} rounds ".format(sampleSpaceExploitation))
     
@@ -117,24 +111,24 @@ def agentTraining(noOfDecks,
                   successHistory[1]/sampleSpaceExploitation,
                   successHistory[2]/sampleSpaceExploitation))                   
         
-    return adp.QList
+    return agent.QList  # , objectiveScore
 
 
 #%%
     
-q = agentTraining(2,
-                  500,
-                  500,
-                  "QLearning",
-                  0.8,
-                  qTable=None)
+q, obj = agentTraining(2,
+                       50,
+                       50,
+                      "QL",
+                       0.8,
+                       qTable=None)
 
 #%%
 
 q = agentTraining(1,
                   500,
                   500,
-                  "QLearning",
+                  "QL",
                   0.8)
 
 #%%

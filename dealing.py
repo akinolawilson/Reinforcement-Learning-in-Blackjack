@@ -7,8 +7,10 @@ class Dealing:
     blackJack = 21
     aceCritical = 2
     
-    def __init__(self, deckSize, deck=None):
-        
+    def __init__(self, deckSize):
+        '''
+        deckSize = int, 1,2,3...
+        '''
         self.agentHand = []
         self.dealerHand = []
         self.aceCriticalHit = False # if true we have more than two aces in round 
@@ -19,15 +21,15 @@ class Dealing:
         self.hitScore = 0
         self.hitRound = False
         self.ending = False
-        
-        
+        self.objectiveScore = 0
+        self.objective = 0 
         ########################################## deck info for agent 
         self.deckSize = deckSize                 #
         self.newDeck = self.createDeck(deckSize) # list of cards
         self.initialDeckSize = len(self.newDeck) #
         self.remainingDeckSize = 0               
-        self.deck = self.newDeck[:]
-        #######################################
+        self.deck = self.newDeck[:]              #
+        ##########################################
 
 
 
@@ -37,10 +39,12 @@ class Dealing:
         if self.ending == True:                          #
             self.deck = self.createDeck(self.deckSize)
             self.newRound()
+            self.objective = self.objectiveScore 
+            self.objectiveScore = 0 
             return True
         else:
             return False
-        #################################################    
+        ##################################################    
         
         
         
@@ -53,17 +57,17 @@ class Dealing:
         self.agentScore = 0
         self.dealerScore = 0
         self.partialDealerScore = 0
-        self.hitRound = False
+        self.hitRound = False               #
         self.aceCriticalHit = False         #
         self.ending = False                 #
         #####################################
         try:
-            self.agentHand.append(self.deck[0]) #    
-            del self.deck[0]                    # remove card top card of deck 
-        except IndexError:                      # 
-            self.ending = True                  # need to test each draw incase 
-        else:                                   # last card. look at function ifGameEnd(self)
-            pass                                # to see consequences of setting = True
+            self.agentHand.append(self.deck[0])  #    
+            del self.deck[0]                     # remove card top card of deck 
+        except IndexError:                       # 
+            self.ending = True                   # need to test each draw incase 
+        else:                                    # last card. look at function ifGameEnd(self)
+            pass                                 # to see consequences of setting = True
             
         try:
             self.dealerHand.append(self.deck[0]) # first draw for dealer     
@@ -90,6 +94,7 @@ class Dealing:
             pass
         
         self.remainingDeckSize = len(self.deck)
+        self.score()
 ###############################################################################  
 
 
@@ -98,17 +103,15 @@ class Dealing:
 ###############################################################################
     def hit(self): # hit for agent     
         try:
-            
             self.agentHand.append(self.deck[0])
             del self.deck[0]
-            
             self.hitRound = True                     # set to true to make sure score 
-            self.remainingDeckSize = len(self.deck)  # for hit round  is calculated correctly
-        
+            self.remainingDeckSize = len(self.deck)
+            self.score()
+            self.actionOutcome(1)                                        # for hit round  is calculated correctly
         except IndexError:
             self.ending = True
-        else:
-            pass             
+             
 ###############################################################################
 
 
@@ -119,15 +122,17 @@ class Dealing:
         
         #
         # agent score 
-        ####################################################################
+        #######################################################################
         if self.hitRound == False:
+                    
             for i in range(len(self.agentHand)):
-                try:                  
+                try:    
                     self.agentScore += int(self.agentHand[i])
-                except ValueError:                                         
+                except (ValueError,IndexError):
                     pass
-                if self.agentHand[i] in ('J', 'K', 'Q','A'):                  
-                    if self.agentHand[i] == 'A':  
+            
+                if self.agentHand[i] in ['J', 'K', 'Q','A']:
+                    if self.agentHand[i] == 'A':
                         self.aceCount += 1
                         if self.aceCount == Dealing.aceCritical: # if two aces drawn in beginning
                             self.agentScore += 1
@@ -138,32 +143,38 @@ class Dealing:
                         self.agentScore += 10 # for J, K and Q
         
             self.hitScore = self.agentScore # save as different score for hitting possibility
-        
+            
         #
         # Dealer score  only calculate for new round          
         ########################################################################         
-        if self.hitRound == False:
+        if self.hitRound == False and len(self.dealerHand) > 0:
             for i in range(len(self.dealerHand)):
                 try:
                     self.dealerScore += int(self.dealerHand[i])    
-                except ValueError:                                    
-                    pass                                                
-                if self.dealerHand[i] in ('J','K','Q','A'):                                                     
+                except (ValueError,IndexError):                                    
+                    pass
+                if self.dealerHand[i] in ['J','K','Q','A']:     
                     if self.dealerHand[i] == 'A':
-                        self.dealerScore += 11 # Dont have to worry about 
-                    else:                      # dealer ace value/ number of   
+                        try: 
+                            self.dealerScore += 11 # Dont have to worry about
+                        except (IndexError,ValueError):
+                            pass
+                    else:                          # dealer ace value/ number of   
                         self.dealerScore += 10 # for J, K and Q
-            
+                
             #
             #dealer's score visible to agent in game
             ###################################################################
             try:
                 self.partialDealerScore += int(self.dealerHand[0])    
-            except ValueError:
+            except (ValueError,IndexError):
                 pass
-            if self.dealerHand[0] in ('J','K','Q','A'):
+            if self.dealerHand[0] in ['J','K','Q','A']:
                 if str(self.dealerHand[0]) == 'A':
-                    self.partialDealerScore += 11
+                    try:
+                        self.partialDealerScore += 11
+                    except (IndexError,ValueError):
+                        pass
                 else:
                     self.partialDealerScore += 10
         
@@ -172,21 +183,24 @@ class Dealing:
         ########################################################################
         
         if self.hitRound == True:
+            
             try:                                                            
-                self.hitScore = self.hitScore + int(self.agentHand[-1])         
+                self.hitScore += int(self.agentHand[-1])         
             except ValueError:                                              
-                pass                                                        
-            if self.agentHand[-1] in ('J','K','Q','A'):
+                pass 
+                                                       
+            if self.agentHand[-1] in ['J','K','Q','A']:
+                
                 if self.agentHand[-1] == 'A':                                   
                     self.aceCount += 1
                     if self.hitScore + 11 > Dealing.blackJack:
-                        self.hitScore = self.hitScore + 1
+                        self.hitScore += 1
                     else:
-                        self.hitScore = self.hitScore + 11
+                        self.hitScore += 11
                         self.aceCriticalHit = True
                 else:
-                    self.hitScore = self.hitScore + 10
-                    
+                    self.hitScore += 10
+    
    
     def actionOutcome(self, action): 
         
@@ -198,33 +212,48 @@ class Dealing:
         # possibly need to alter this: trying to maximise the score, which is 
         # denoted by self.objectiveScore, only have winning as objective, not 
         # by HOW much we are winning. 
-        
-        
+    
         reward = 0
-        if action == 0: # to stick with current cards
-            if self.dealerScore < self.hitScore <= Dealing.blackJack:
-                ########## self.objectiveScore =  self.hitScore**2  ##### <- SHOULD BE
-                reward = 1                                            # MAXIMISING THIS
+        breaker = False
+        if action == 0:         # need to jump out loop, issues with giving wrong reward
+            breaker = True      # due to sequentially running through the if loops
+    
+        while breaker == True: # to stick with current cards
+                
+            if int(self.hitScore) < int(self.dealerScore):
+                reward = -1
                 self.newRound()
+                breaker = False
+                return reward 
+             
+            if int(self.hitScore) > int(Dealing.blackJack):
+                reward = -1
+                self.newRound()            
+                breaker = False
+                return reward
             
-            elif self.dealerScore == self.hitScore:
-                ########### self.objectiveScore = 0 ##########
+            if int(self.dealerScore) == int(self.hitScore):
                 reward = 0
                 self.newRound()
+                breaker = False 
+                return reward
             
-            elif self.hitScore < self.dealerScore:
-                ########### self.objectiveScore = 0 ##########
-                reward = -1
+            if int(self.dealerScore) < int(self.hitScore) <= int(Dealing.blackJack):    
+                self.objectiveScore +=  self.hitScore**2  ##### <- SHOULD BE
+                reward = 1                                            # MAXIMISING THIS
                 self.newRound()
-            
+                breaker = False
+                return reward
+                
+        
         if action == 1: # to take a hit from the deck
             
-            self.hit()
-            self.score()
-            if self.agentScore > Dealing.blackJack:
+            # self.hit()
+            
+            if int(self.hitScore) > int(Dealing.blackJack):
                 reward = -1
                 self.newRound()
-            
+                    
         return reward
             
               

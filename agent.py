@@ -17,8 +17,10 @@ class AgentDecisionProcess:
                  trueDealerScore,
                  aceCount,
                  aceCriticalHit,
-                 gamma): # discount factor a 
-
+                 objective,
+                 gamma): # discount factor     
+        
+        self.objective = objective
         self.gamma = gamma
         self.sizeDeck = initialDeckSize
         self.remainingDeckSize = len(deck)
@@ -82,27 +84,42 @@ class AgentDecisionProcess:
         # Identifying states identical to current state and collecting 
         # q-values corresponding to hitting or sticking in state. If none is 
         # found, a random action is taken.
+        qHitList, qStickList = [],[]
         for i in range(len(cls.QList)):
-            if (cls.QList[i][0] == initialSize and
-                cls.QList[i][1] == remainingDeckSize and
-                cls.QList[i][2] == agentScore and 
-                cls.QList[i][3] == dealerScore and 
-                cls.QList[i][4] == trueDealerScore and 
-                cls.QList[i][5] == aceCount and 
-                cls.QList[i][6] == aceCriticalHit and
-              # cls.QList[i][7] == Q Value for state i  
-                cls.QList[i][8] == 1):
-                   qHit = cls.QList[i][7]
-                   
-            if(cls.QList[i][0] == initialSize and
-               cls.QList[i][1] == remainingDeckSize and
-               cls.QList[i][2] == agentScore and 
-               cls.QList[i][3] == dealerScore and 
-               cls.QList[i][4] == trueDealerScore and 
-               cls.QList[i][5] == aceCount and 
-               cls.QList[i][6] == aceCriticalHit and
-               cls.QList[i][8] == 0):
-                   qStick = cls.QList[i][7]
+            try:
+                if (cls.QList[i][0] == initialSize and
+                    cls.QList[i][1] == remainingDeckSize and
+                    cls.QList[i][2] == agentScore and 
+                    cls.QList[i][3] == dealerScore and 
+                    cls.QList[i][4] == trueDealerScore and 
+                    cls.QList[i][5] == aceCount and 
+                    cls.QList[i][6] == aceCriticalHit and
+            ##### cls.QList[i][7] == Q Value for state i , what we are after 
+                    cls.QList[i][8] == 1):
+                        qHitList.append(cls.QList[i][7]) 
+
+                if(cls.QList[i][0] == initialSize and
+                   cls.QList[i][1] == remainingDeckSize and
+                   cls.QList[i][2] == agentScore and 
+                   cls.QList[i][3] == dealerScore and 
+                   cls.QList[i][4] == trueDealerScore and 
+                   cls.QList[i][5] == aceCount and 
+                   cls.QList[i][6] == aceCriticalHit and
+            ###### cls.QList[i][7] == Q Value for state i; what we want 
+                   cls.QList[i][8] == 0):
+                        qStickList.append(cls.QList[i][7]) 
+                    
+                
+            except IndexError:
+                pass
+            
+            finally:
+                
+                try:
+                    qHit = max(qHitList)
+                    qStick = max(qStickList)        
+                except ValueError:
+                    pass
                 
         if qHit > qStick:
             return 1
@@ -135,13 +152,13 @@ class AgentDecisionProcess:
         
             alpha = 1 / stateActionCount
             
-            if policySearchMethod in ["QLearning","TD","SARSA"]: 
+            if policySearchMethod in ["QL","TD","SARSA"]: 
             
                 oldQ = exploredStateAction[i][-2]
                 # update Q value for (nextState, policyAction) pair
                 if i < len(range(cls.QList))-1: # whilst not at terminal state hence the minus 1
                     
-                    if policySearchMethod == "QLearning":
+                    if policySearchMethod == "QL":
                         hitConsideration = cls.QList[i+1][:-1]+(1,) # alter/ keep to 'decision':1 ->  hitMeBaby
                         stickConsideration = cls.QList[i+1][:-1]+(0,) # alter/ keep to 'decision':0 -> stick
                                                                                            
@@ -167,7 +184,7 @@ class AgentDecisionProcess:
                                                                                          #       maxQ = max( maxValueHit, maxValueStick ) # find action which gives maximum
                                                                                          ###############################################################    
                         
-                        # discounting future reward   
+                        # discounting future rewards   
                         sumOfFutureDiscountedRewards = gamma * maxQ
 
                     if policySearchMethod == "SARSA":
@@ -181,7 +198,7 @@ class AgentDecisionProcess:
                 else: # at terminal state, no value for being in state 
                     sumOfFutureDiscountedRewards = 0
             
-            if policySearchMethod == "QLearning":
+            if policySearchMethod == "QL":
                 update = 0 
                 for stateAction in exploredStateAction[i]:
                     elements = list(stateAction)
