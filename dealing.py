@@ -4,195 +4,262 @@ import random
 
 class Dealing:
     
-    def __init__(self, deckSize, deck, agentScore):
-        
-        self.blackJack = 21
-#        self.newRound = False
-#        self.hit = False
+    blackJack = 21
+    aceCritical = 2
+    
+    def __init__(self, deckSize):
+        '''
+        deckSize = int, 1,2,3...
+        '''
         self.agentHand = []
         self.dealerHand = []
-        self.agentTotalInRoundScore = 0
+        self.aceCriticalHit = False # if true we have more than two aces in round 
+        self.partialDealerScore = 0
+        self.dealerScore = 0
         self.agentScore = 0
-     #   self.dealerScore = 0
-        
-        self.newDeck = self.createDeck(deckSize)
-        self.initialDeck = self.newDeck
-        self.deck = self.newDeck[:]
-        
-        self.agentAceInHand = 0; # Agent possibly has ace in hand 
-        self.dealerPartialHand = 0; # partial information during round
-        
-       # if self.newRound == True:
-       #     self.drawNewRound(yes=True)
-       # if self.hit == True:
-       #     self.drawInRoundHit(yes=True)
-        
+        self.aceCount = 0
+        self.hitScore = 0
+        self.hitRound = False
+        self.ending = False
+        ########################################## deck info for agent 
+        self.deckSize = deckSize                 #
+        self.newDeck = self.createDeck(deckSize) # list of cards
+        self.initialDeckSize = len(self.newDeck) #
+        self.remainingDeckSize = 0               
+        self.deck = self.newDeck[:]              #
+        ##########################################
 
-    def drawNewRound(self, yes=False):
-        if yes == True:
-            self.agentHand.append(self.deck[0]) # first draw for agent     
-            del self.deck[0] # remove card top card of deck 
-            self.dealerHand.append(self.deck[0]) # first draw for dealer
+
+
+
+        ################################################## function allows verifying 
+    def ifGameEnd(self):                                 # during training if game has ended
+        if self.ending == True:                          #
+            self.deck = self.createDeck(self.deckSize)
+            self.newRound() # Since at start need to provide players with cards
+            return True
+        else:
+            return False
+        ##################################################    
+        
+        
+        
+    def newRound(self): 
+        ##################################### resetting attributes each around since  
+        self.agentHand = []                 # they are set to zero with method call
+        self.dealerHand = []                #
+        self.hitScore = 0                   #
+        self.aceCount = 0
+        self.agentScore = 0
+        self.dealerScore = 0
+        self.partialDealerScore = 0
+        self.hitRound = False               #
+        self.aceCriticalHit = False         #
+        self.ending = False                 #
+        #####################################
+        try:
+            self.agentHand.append(self.deck[0])  #    
+            del self.deck[0]                     # remove card top card of deck 
+        except IndexError:                       # 
+            self.ending = True                   # need to test each draw incase 
+        else:                                    # last card. look at function ifGameEnd(self)
+            pass                                 # to see consequences of setting = True
+            
+        try:
+            self.dealerHand.append(self.deck[0]) # first draw for dealer     
             del self.deck[0]
+        except IndexError:
+            self.ending = True
+        else:
+            pass
+        
+        try:
             self.agentHand.append(self.deck[0]) # second draw for agent
             del self.deck[0]
-            self.dealerHand.append(self.deck[0]) # second draw for dealer. the unknown card, 
-            del self.deck[0]                     # hidden information to the dealer
-             
-   
-    
-    def drawInRoundHit(self, yes=False):
-        if yes == True:    
-            self.agentHand.append(self.deck[0]) # hit for agent     
-            del self.deck[0] # remove card top card of deck 
-    
-    
-    
-
-    def agentPersonalScoreComputation(self):
-        
-        noOfAces, acePossible, aceUsed = 0, False, False # aceUsed implies this has happened => 11 goes to 1 
-                                                         # acePossible implies CAN use ace and => 11 goes to 1
-        ####################################################################
-        if len(self.agentHand) == 2: # we know its a new round. rather than hit. #
-            for i in range(len(self.agentHand)):                                       #
-                                                                           #                    
-                try:                                                       #  
-                    self.score += int(self.agentHand[i])    # 2 to 10 cards          # New round, since number of 
-                except ValueError:                                         # cards is more than 1, i,e
-                    pass                                                   # 2 cards dealt = New Round
-                                                                           #  
-                else:                                                      #   
-                    if str(self.agentHand[i]) == 'A': # A face cards            #         
-                        noOfAces += 1
-                        acePossible = True
-                        aceUsed = False                                           #
-                        self.agentScore += 11                                        #
-                    else:                                                  #
-                        self.agentScore += 10 # for J, K and Q
-                finally:
-                    self.agentTotalInRoundScore = self.agentScore
-    
-               #     return scoreHitRound, noOfAcesHitRound
-        
-        #####################################################################
+        except IndexError:
+            self.ending = True
         else:
-                                                                       #
-            try:                                                            # Hit round since no.
-                self.agentTotalInRoundScore = self.agentTotalInRoundScore + int(self.agentHand[-1])                  #  of cards not 2 but must be 
-            except ValueError:                                              # greater than. Hence a hit round
-                pass                                                        #
-            else:                                                           #
-                if str(self.agentHand[-1]) == 'A':                                   #
-                    noOfAces = noOfAces + 1 
-                    acePossible = True
-                    while self.agentTotalInRoundScore + 11 > self.blackJack:
-                        self.agentTotalInRoundScore = self.agentTotalInRoundScore + 1
-                        aceUsed = True
-                        
-                    else:
-                        self.agentTotalInRoundScore = self.agentTotalInRoundScore + 11
-                        
-                else:
-                    self.agentTotalInRoundScore = self.agentTotalInRoundScore + 10
+            pass
+        
+        try:
+            self.dealerHand.append(self.deck[0]) # second draw for agent
+            del self.deck[0]
+        except IndexError:
+            self.ending = True
+        else:
+            pass
+        
+        self.remainingDeckSize = len(self.deck)
+        self.score()
+###############################################################################  
+
+
+      
+        
+###############################################################################
+    def hit(self): # hit for agent     
+        try:
+            self.agentHand.append(self.deck[0])
+            del self.deck[0]
+            self.hitRound = True                     # set to true to make sure score 
+            self.remainingDeckSize = len(self.deck)
+            self.score()
+        except IndexError:
+            self.ending = True
+             
+###############################################################################
+
+
+
+
+###############################################################################
+    def score(self):
+        # agent score 
+        #######################################################################
+        if self.hitRound == False:
                     
-            finally:
-                return noOfAces, acePossible, aceUsed
+            for i in range(len(self.agentHand)):
+                try:    
+                    self.agentScore += int(self.agentHand[i])
+                except (ValueError,IndexError):
+                    pass
             
-            
+                if self.agentHand[i] in ['J', 'K', 'Q','A']:
+                    if self.agentHand[i] == 'A':
+                        self.aceCount += 1
+                        if self.aceCount == Dealing.aceCritical: # if two aces drawn in beginning
+                            self.agentScore += 1
+                            self.aceCriticalHit = True # second ace not usable,
+                        else:                          # can only DECREASE face value
+                            self.agentScore += 11                               
+                    else:                         
+                        self.agentScore += 10 # for J, K and Q
         
-            
-            
-    def hitOrStickAction(self, dealing, action, score):
+            self.hitScore = self.agentScore # save as different score for hitting possibility
+        ########################################################################    
+        #
+        # Dealer score  only calculate for new round          
+        ########################################################################         
+        if self.hitRound == False and len(self.dealerHand) > 0:
+            for i in range(len(self.dealerHand)):
+                try:
+                    self.dealerScore += int(self.dealerHand[i])    
+                except (ValueError,IndexError):                                    
+                    pass
+                if self.dealerHand[i] in ['J','K','Q','A']:     
+                    if self.dealerHand[i] == 'A':
+                        try: 
+                            self.dealerScore += 11 # Dont have to worry about
+                        except (IndexError,ValueError):
+                            pass
+                    else:                          # dealer ace value/ number of   
+                        self.dealerScore += 10 # for J, K and Q
+            ###################################################################    
+            #
+            #dealer's score visible to agent in game
+            ###################################################################
+            try:
+                self.partialDealerScore += int(self.dealerHand[0])    
+            except (ValueError,IndexError):
+                pass
+            if self.dealerHand[0] in ['J','K','Q','A']:
+                if str(self.dealerHand[0]) == 'A':
+                    try:
+                        self.partialDealerScore += 11
+                    except (IndexError,ValueError):
+                        pass
+                else:
+                    self.partialDealerScore += 10
+        ########################################################################
+        #
+        #The hit round, no calculations for Dealer; passive. 
+        ########################################################################
         
-        reward, agentScore, dealerScore = 0, dealing.agentScore, dealing.dealerScore
-        
-        if action == 0: # to stick with current cards
-            if  dealerScore < agentScore <= self.blackJack:
-                self.agentTotalScore += agentScore**2
-                reward = 1
+        if self.hitRound == True:
             
-            elif dealerScore == agentScore:
-            
-                reward = 0
+            try:                                                            
+                self.hitScore += int(self.agentHand[-1])         
+            except ValueError:                                              
+                pass 
+                                                       
+            if self.agentHand[-1] in ['J','K','Q','A']:
                 
-            else:
-                reward = -1
+                if self.agentHand[-1] == 'A':                                   
+                    self.aceCount += 1
+                    if self.hitScore + 11 > Dealing.blackJack:
+                        self.hitScore += 1
+                    else:
+                        self.hitScore += 11
+                        self.aceCriticalHit = True
+                else:
+                    self.hitScore += 10
+###############################################################################
+#                    
+#    reward function
+###############################################################################   
+    def actionOutcome(self, action):
+        
+        reward = 0
+        breaker = False
+        
+        if action == 0:         # need to jump out loop, issues with giving wrong reward
+            breaker = True      # due to sequentially running through the if loops
+    
+        while breaker == True: # to stick with current cards
+                
+            if int(self.hitScore) < int(self.dealerScore):
+                
+                reward = -1 * (self.dealerScore - self.hitScore)**2
+                self.newRound()
+                breaker = False
+                return reward 
+             
+            if int(self.hitScore) > int(Dealing.blackJack):
+                reward = -1 * (Dealing.blackJack - self.hitScore )**2
+                self.newRound()            
+                breaker = False
+                return reward
+            
+            if int(self.dealerScore) == int(self.hitScore):
+                reward = 0
+                self.newRound()
+                breaker = False 
+                return reward
+            
+            if int(self.dealerScore) < int(self.hitScore) <= int(Dealing.blackJack):    
+                
+                reward = 1 * self.hitScore**2   
+                self.newRound()
+                breaker = False
+                return reward
+                
         
         if action == 1: # to take a hit from the deck
             
-            dealing.drawInRoundHit(yes=True)
-            agentScore = dealing.agentScore
+            self.hit()
             
-            if action == 0: # to stick 
-                
-                if  dealerScore < agentScore <= self.blackJack:
-                    self.agentTotalScore += agentScore**2
-                    reward = 1
+            if int(self.hitScore) > int(Dealing.blackJack):
+                reward = -1 * (Dealing.blackJack - self.hitScore)**2
+                self.newRound()
+                return reward
             
-                elif dealerScore == agentScore:        
-                    reward = 0
-                
-                else:
-                    reward = -1
-                    
-            if action == 1: # to take a hit from the deck
+        return reward
+            
+              
     
-                dealing.drawInRoundHit(yes=True)
-                agentScore = dealing.agentScore
-            
-                if action == 0: # to stick 
-                
-                    if  dealerScore < agentScore <= self.blackJack:
-                        self.agentTotalScore += agentScore**2
-                        reward = 1
-                
-                    elif dealerScore == agentScore:        
-                        reward = 0
-                    
-                    else:
-                        reward = -1
-                        
-                if action == 1: # to take a hit from the deck, ALLOWING THREE HITS
-    
-                    dealing.drawInRoundHit(yes=True)
-                    agentScore = dealing.agentScore
-            
-                    if action == 0: # to stick 
-                    
-                        if  dealerScore < agentScore <= self.blackJack:
-                            self.agentTotalScore += agentScore**2
-                            reward = 1
-                    
-                        elif dealerScore == agentScore:        
-                            reward = 0
-                        
-                        else:
-                            reward = -1
-                            
-        
-            agentTotalScore = self.agentTotalScore                    
-                            
-        return agentTotalScore, reward       
-
-    
-    def createDeck(self, *kwargs):
+    def createDeck(self, *numberOrInfinity):
         """This function creates a deck of cards that is integer multiples of a standard
-        deck of 52 cards. 
-        
+        deck of 52 cards.
         Example: enter 1 returns a deck of 52 cards.
                  enter 2 returns a deck of 104 cards.
-                    
         For infinite size deck enter arguement 'infinite',  WITH '' bounding the arguement
-        
         The deck returned will be a list -> ['A', '3',....,'4']
         
         """
-    
         card_faces = ['2', '3', '4', '5', '6', '7',
                       '8', '9', '10', 'J', 'Q', 'K', 'A']
         deck = []
-        for size in kwargs:
+        for size in numberOrInfinity:
             if size == 'infinite': 
                 numberOfEachCard = np.inf*np.ones((1,13))
                 ##
@@ -237,6 +304,5 @@ class Dealing:
                     
                     freshDeck = random.sample(deck, len(deck)) # used to shuffle deck        
                                                                
-        return freshDeck                                                                                   
-    
-        #%%
+        return freshDeck                                                                                                                  
+#%%                                              
