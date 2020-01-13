@@ -11,9 +11,27 @@ def agentTraining(noOfDecks,
                   method,
                   gamma,
                   qTable=None):
+    """
+    Function for training an agent on a simplified version of blackjack with a 
+    passive dealer.
     
-
-    
+    -noOfDecks is the number decks the agents trains with
+    -sampleSpaceSearching specifies the 
+    -sampleSpaceExploitation specifies the
+    -method can be one of QL, TD, SARSA
+    -gamma is the discount factor
+    -qTable has None set as default, if using a q table that has already been 
+     generated import the csv file and name it as "qTable[]" where the decksize
+     replaces [].
+     
+     Example: QTable,pe, pO,pointOptimal,pointEgreedy= agentTraining(1,
+                                                        50,
+                                                        50,
+                                                        "TD",
+                                                        1,
+                                                        None)
+     returns the QTable, 
+    """
     deckSize = noOfDecks*52
     optimalScore = 0 # winning score and losing Score
     egreedyScore = 0
@@ -32,7 +50,7 @@ def agentTraining(noOfDecks,
                 gamePlay.aceCriticalHit,
                 gamma)
     
-    ################################################################# # for iterating 
+    # for iterating 
     if qTable !=None:
         if type(qTable) == int:
              agent.QList = []
@@ -42,10 +60,6 @@ def agentTraining(noOfDecks,
                 # for qtable, expect form: [[(trajector1)], [(initialSize,remainingAmount,agentScore,dealerScore',
                 # NoOfAces,twoAcesOrMore,reward,decision),...]]
      
-             
-    ################################################################# 
-    
-    
     for trajectoryNumber in range(sampleSpaceSearching + sampleSpaceExploitation):
         exploredStateAction = []
         while gamePlay.ifGameEnd() == False:    
@@ -62,7 +76,6 @@ def agentTraining(noOfDecks,
                                                   gamePlay.dealerScore, # true cards
                                                   gamePlay.aceCount,#8
                                                   gamePlay.aceCriticalHit)#8
-    
             else: # if in exploitation phase 
                 action = agent.optimalPolicyQTable(deckSize,
                                                    gamePlay.remainingDeckSize,
@@ -78,12 +91,10 @@ def agentTraining(noOfDecks,
             actualDealerScore = gamePlay.dealerScore
             numOfaces = gamePlay.aceCount
             criticalAce = gamePlay.aceCriticalHit # boolean 
-            ###################################################################
             reward = gamePlay.actionOutcome(action)
             # if gamePlay.actionOutcome(action) method executed, newround or hit method is 
             # also exectued. this inturn updates gameplay details. Hence assigned 
             # variables prior to method excecution
-            ###################################################################
             stateAction = (deckSize, numRemaining,
                            agentScore,agentVisScore,
                            actualDealerScore, numOfaces,
@@ -94,10 +105,7 @@ def agentTraining(noOfDecks,
                 and agentScore <= gamePlay.blackJack):
                 # if not a repeated state-action anywhere in my searchedSpace, save it
                 exploredStateAction.append(stateAction)
-            
                 
-
-            
             if gamePlay.ifGameEnd() == True:
                 agent.QList.append(exploredStateAction)
                 agent.QTableUpdate(method,
@@ -106,30 +114,23 @@ def agentTraining(noOfDecks,
                 break
 
             if trajectoryNumber > sampleSpaceSearching: # optimal policy 
-                
                 if reward > 0: 
                     optimalScore += gamePlay.hitScore**2
                     pO[0] +=1 # winning points
-                
                 if reward ==0:
-                    pO[1] +=1
-                    
+                    pO[1] +=1    
                 if reward < 0:
                     pO[2] += 1
-            
             
             else: # eGreedy policy 
                 if reward > 0: 
                     egreedyScore += gamePlay.hitScore**2
                     pe[0] +=1 # winning points
-                
                 if reward ==0:
                     pe[1] +=1
-
                 if reward < 0:
                     pe[2] +=1
                     
-                               
     print("Deck size = {} deck(s) using policy"
           " search method: {}".format(gamePlay.deckSize,
                                               method)) 
@@ -137,7 +138,6 @@ def agentTraining(noOfDecks,
     print("The agent exploration period = {} rounds.Followed by {}"
           " rounds of exploitation".format(sampleSpaceSearching,sampleSpaceExploitation))
 
-    
     print("The Agent average quadratic score per game exploration phase = {}"
           " The exploitation quadratic score per game =  {}"
           " In terms of winning and loosing against the house,"
@@ -153,5 +153,3 @@ def agentTraining(noOfDecks,
                                                    np.round(pO[2]/sum(pO)*100,1 )))                   
 
     return agent.QList, pe, pO, egreedyScore, optimalScore
-
-

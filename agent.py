@@ -32,18 +32,13 @@ class AgentDecisionProcess:
                                    # If true AND aceCount >=3 then out of actions  
                                    # then {Aup, Adown} -> [A1=Adown,A2=Adown,A3=Adown]
                                    # must be chosen
-################################################### 
     @staticmethod
     def actionInitiating():
-        
         if random.random() <= 0.5:
             return 0 # stick
         else:
             return 1 # hitmebaby
-###################################################    
-    
-        
-###################################################        
+     
     def eGreedyPolicyQTable(self,
                             e,
                             initialSize,
@@ -63,11 +58,7 @@ class AgentDecisionProcess:
                                             trueDealerScore,
                                             aceCount,
                                             aceCriticalHit)
-            
-#####################################################        
-            
-            
-#####################################################  
+        
     @classmethod 
     def optimalPolicyQTable(cls,
                             initialSize,
@@ -120,9 +111,7 @@ class AgentDecisionProcess:
             return 0
         else:
             return AgentDecisionProcess.actionInitiating()
-########################################################    
-          
-########################################################       
+   
     @classmethod     
     def QTableUpdate(cls,
                      policySearchMethod,
@@ -135,18 +124,17 @@ class AgentDecisionProcess:
                 trajectoryComponent = cls.QList[trajectory][attemptedStateAction] # and stateAction value  
                 #stateActionCount = attemptedStateAction + 1
             
-                alpha = 1 / (attemptedStateAction + 1)
-#################################################################################                 
-                if policySearchMethod in ["QL","TD","SARSA"]:######################### 
-            
+                alpha = 1 / (attemptedStateAction + 1)           
+                if policySearchMethod in ["QL","TD","SARSA"]:
                     oldQ = trajectoryComponent[-2]
-
                     # update Q value for (nextState, policyAction) pair
                     if attemptedStateAction < (len(cls.QList[trajectory])-1): # whilst not at terminal state hence the minus 1
                         
                         if policySearchMethod == "QL":
-                            hitHypothesis = cls.QList[trajectory][attemptedStateAction+1][:-1]+(1,) # alter/ keep to 'decision':1 ->  hitMeBaby
-                            stickHypothesis = cls.QList[trajectory][attemptedStateAction+1][:-1]+(0,) # alter/ keep to 'decision':0 -> stick
+                            hitHypothesis = cls.QList[trajectory][attemptedStateAction+1][:-1]+(1,) 
+                            # alter/ keep to 'decision':1 ->  hit
+                            stickHypothesis = cls.QList[trajectory][attemptedStateAction+1][:-1]+(0,) 
+                            # alter/ keep to 'decision':0 -> stick
                             maxQ = max(  hitHypothesis[:][:][-2],
                                        stickHypothesis[:][:][-2] )                   
                             sumOfFutureDiscountedRewards = gamma * maxQ # discounting future rewards
@@ -155,18 +143,13 @@ class AgentDecisionProcess:
                             nextStateAction = cls.QList[trajectory][attemptedStateAction+1]
                             sumOfFutureDiscountedRewards = gamma * nextStateAction[-2]
                         
-                        
-                           
                         if policySearchMethod == "TD":
                             nextStateAction = cls.QList[trajectory][attemptedStateAction+1]
                             sumOfFutureDiscountedRewards = gamma * nextStateAction[-2]
-                        #########  
-                        
-                        
                         
                     else: # at terminal state, no value for being in state 
                         sumOfFutureDiscountedRewards = 0
-##################################################################################                
+                        
                 if policySearchMethod == "QL":
                     update = 0
                     elements = list(trajectoryComponent)
@@ -181,8 +164,6 @@ class AgentDecisionProcess:
                     update = tuple(elements)
                     cls.QList[trajectory][attemptedStateAction] = update
                 
-                
-                ##################    
                 if policySearchMethod == "TD":
                     update = 0
                     elements = list(trajectoryComponent)
@@ -191,30 +172,4 @@ class AgentDecisionProcess:
                                                  cls.QList[trajectory][attemptedStateAction][-2])                   
                     update = tuple(elements)
                     cls.QList[trajectory][attemptedStateAction] = update
-                ###################
-                
         return cls.QList
- #%%%%%   
-#    @staticmethod
-#    def QTableUpdateTD(trajectory, reward, gamma):
-#        try:
-#            for stateAction in range(len(trajectory)):
-#                if stateAction < len(trajectory)-1:
-#                    
-#                    alpha = 1 / (stateAction + 1)
-#                    
-#                    oldQ = trajectory[stateAction][-2]
-#                    sumOfFutureDiscountedRewards= gamma*oldQ
-#                    
-#                    elements = list(trajectory[stateAction])
-#                    elements[-2] = oldQ + alpha*(reward +
-#                                                 sumOfFutureDiscountedRewards-
-#                                                 oldQ)
-#                    
-#                    updatedValue = tuple(elements)
-#                    trajectory = updatedValue 
-#        except TypeError:
-#            return
-#        else:            
-#            return trajectory
-
