@@ -15,8 +15,8 @@ def agentTraining(noOfDecks,
 
     
     deckSize = noOfDecks*52
-    pointOptimal =[0,0] # winning score and losing Score
-    pointEgreedy = [0,0]
+    optimalScore = 0 # winning score and losing Score
+    egreedyScore = 0
     pO = [0,0,0]
     pe = [0,0,0]
 
@@ -108,26 +108,27 @@ def agentTraining(noOfDecks,
             if trajectoryNumber > sampleSpaceSearching: # optimal policy 
                 
                 if reward > 0: 
-                    pointOptimal[0] += reward
-                    pO[0] +=1
-                elif reward ==0:
+                    optimalScore += gamePlay.hitScore**2
+                    pO[0] +=1 # winning points
+                
+                if reward ==0:
                     pO[1] +=1
-                    pass
-                elif reward < 0:
-                    pointOptimal[1] += 0
+                    
+                if reward < 0:
                     pO[2] += 1
             
             
             else: # eGreedy policy 
                 if reward > 0: 
-                    pointEgreedy[0] += reward
-                    pe[0] +=1
-                elif reward ==0:
+                    egreedyScore += gamePlay.hitScore**2
+                    pe[0] +=1 # winning points
+                
+                if reward ==0:
                     pe[1] +=1
-                    pass
-                elif reward < 0:
+
+                if reward < 0:
                     pe[2] +=1
-                    pointEgreedy[1] += reward
+                    
                                
     print("Deck size = {} deck(s) using policy"
           " search method: {}".format(gamePlay.deckSize,
@@ -142,8 +143,8 @@ def agentTraining(noOfDecks,
           " In terms of winning and loosing against the house,"
           " the Agent wins {}% draws {}% and loses {}% on the training (explore) stage, followed by "
           " wins {}% draws {}% and loses {}% on the"
-          " testing (exploitation) stage ".format((pointEgreedy[0]/sampleSpaceSearching),
-                                                   (pointOptimal[0]/sampleSpaceExploitation),
+          " testing (exploitation) stage ".format((egreedyScore/sampleSpaceSearching),
+                                                   (optimalScore/sampleSpaceExploitation),
                                                    np.round(pe[0]/sum(pe)*100,1 ),
                                                    np.round(pe[1]/sum(pe)*100,1 ),
                                                    np.round(pe[2]/sum(pe)*100,1 ),
@@ -151,6 +152,6 @@ def agentTraining(noOfDecks,
                                                    np.round(pO[1]/sum(pO)*100,1 ),
                                                    np.round(pO[2]/sum(pO)*100,1 )))                   
 
-    return agent.QList, pe, pO, pointOptimal, pointEgreedy
+    return agent.QList, pe, pO, egreedyScore, optimalScore
 
 
