@@ -24,11 +24,23 @@ the initial two at the start of each round . The agent is then trained to achiev
 <br>
 <a href="https://www.codecogs.com/eqnedit.php?latex=\xi&space;=&space;\big(&space;\sum&space;c_{i}&space;\big)^2" target="_blank"><img src="https://latex.codecogs.com/gif.latex?\xi&space;=&space;\big(&space;\sum&space;c_{i}&space;\big)^2" title="\xi = \big( \sum c_{i} \big)^2" /></a>.
 <br>
-If the agent's collective hand value, <a href="https://www.codecogs.com/eqnedit.php?latex=\sum&space;c_{i}" target="_blank"><img src="https://latex.codecogs.com/gif.latex?\sum&space;c_{i}" title="\sum c_{i}" /></a>, where the <a href="https://www.codecogs.com/eqnedit.php?latex=c_{i}" target="_blank"><img src="https://latex.codecogs.com/gif.latex?c_{i}" title="c_{i}" /></a>'s represent the numerical value of the agent's in hand cards is greater than the dealers. Otherwise, the in round score was set to 
+If the agent's collective hand value,
+<br>
+<a href="https://www.codecogs.com/eqnedit.php?latex=\sum&space;c_{i}" target="_blank"><img src="https://latex.codecogs.com/gif.latex?\sum&space;c_{i}" title="\sum c_{i}" /></a>,
+<br>
+where the <a href="https://www.codecogs.com/eqnedit.php?latex=c_{i}" target="_blank"><img src="https://latex.codecogs.com/gif.latex?c_{i}" title="c_{i}" /></a>'s represent the numerical value of the agent's in hand cards is greater than the dealers. Otherwise, the in round score was set to 
 <br>
 <a href="https://www.codecogs.com/eqnedit.php?latex=\xi&space;=&space;0" target="_blank"><img src="https://latex.codecogs.com/gif.latex?\xi&space;=&space;0" title="\xi = 0" /></a>
 <br>
-The dynamics of the game play are as follows: Two cards a dealt from a pre-specified multiple of the standard deck of 52 cards to the agent and passive dealer. Then the agent is able to choose from the actions <a href="https://www.codecogs.com/eqnedit.php?latex=\mathbb{A}(s)$&space;=&space;$\{Hit,Stick\}" target="_blank"><img src="https://latex.codecogs.com/gif.latex?\mathbb{A}(s)$&space;=&space;$\{Hit,Stick\}" title="\mathbb{A}(s)$ = $\{Hit,Stick\}" /></a>. The agent was encouraged to maximise the over game total score defined as <a href="https://www.codecogs.com/eqnedit.php?latex=\Xi&space;=&space;\sum\limits_{\substack{i}}^{S}&space;\xi_{i}$" target="_blank"><img src="https://latex.codecogs.com/gif.latex?\Xi&space;=&space;\sum\limits_{\substack{i}}^{S}&space;\xi_{i}$" title="\Xi = \sum\limits_{\substack{i}}^{S} \xi_{i}$" /></a>, where S is the total number of times the agent submitted to stick. 
+The dynamics of the game play are as follows: Two cards a dealt from a pre-specified multiple of the standard deck of 52 cards to the agent and passive dealer. Then the agent is able to choose from the action space
+<br>
+<a href="https://www.codecogs.com/eqnedit.php?latex=\mathbb{A}(s)$&space;=&space;$\{Hit,Stick\}" target="_blank"><img src="https://latex.codecogs.com/gif.latex?\mathbb{A}(s)$&space;=&space;$\{Hit,Stick\}" title="\mathbb{A}(s)$ = $\{Hit,Stick\}" /></a>.
+<br>
+The agent is encouraged to maximise the over game total score defined as
+<br>
+<a href="https://www.codecogs.com/eqnedit.php?latex=\Xi&space;=&space;\sum\limits_{\substack{i}}^{S}&space;\xi_{i}$" target="_blank"><img src="https://latex.codecogs.com/gif.latex?\Xi&space;=&space;\sum\limits_{\substack{i}}^{S}&space;\xi_{i}$" title="\Xi = \sum\limits_{\substack{i}}^{S} \xi_{i}$" /></a>,
+<br>
+where S is the total number of times the agent submitted to stick. 
 <br>
 <br>
 The figure below shows the agent's achieved quadratic score for the different deck multiples and policy iteration methods. 
@@ -69,5 +81,11 @@ is extracted and placed in the working directory when trying to run this script.
 
 ```QTables.zip```:
 <br>
-This compressed file contains the QTables for the various regimes the agent was trained on. Please unzip this
-file and place it in the working directory when attempted to run the validating.py script. 
+This compressed file contains the QTables for the various regimes the agent was trained on and can be downloaded <a href="https://drive.google.com/file/d/1FktDulCeBNC99lXllJE6ht3bbR1fpAuw/view?usp=sharing">here</a> . Please unzip this
+file and place it in the working directory when attempted to run the ```validating.py``` script. 
+
+### Further Development and Reading
+________________________________________________________________________________________________________________________________________
+
+The next task is to separate the dealer from the dealing class into its own class. This will allow implementing dealer actions. Furthermore, there is a clear necessity to find ways to reduced the QTables. For a formal review of this project please find my
+<a href="https://www.researchgate.net/publication/338992214_Blackjack_Reinforcement_Learning_Approaches_to_an_Incomplete_Information_Game">ResearchGate</a> account. 
