@@ -30,7 +30,7 @@ If the agent's collective hand value,
 <br>
 where the <a href="https://www.codecogs.com/eqnedit.php?latex=c_{i}" target="_blank"><img src="https://latex.codecogs.com/gif.latex?c_{i}" title="c_{i}" /></a>'s represent the numerical value of the agent's in hand cards is greater than the dealers. Otherwise, the in round score was set to 
 <br>
-<a href="https://www.codecogs.com/eqnedit.php?latex=\xi&space;=&space;0" target="_blank"><img src="https://latex.codecogs.com/gif.latex?\xi&space;=&space;0" title="\xi = 0" /></a>
+<a href="https://www.codecogs.com/eqnedit.php?latex=\xi&space;=&space;0" target="_blank"><img src="https://latex.codecogs.com/gif.latex?\xi&space;=&space;0" title="\xi = 0" /></a>.
 <br>
 The dynamics of the game play are as follows: Two cards a dealt from a pre-specified multiple of the standard deck of 52 cards to the agent and passive dealer. Then the agent is able to choose from the action space
 <br>
@@ -43,7 +43,8 @@ The agent is encouraged to maximise the over game total score defined as
 where S is the total number of times the agent submitted to stick. 
 <br>
 <br>
-The figure below shows the agent's achieved quadratic score for the different deck multiples and policy iteration methods. 
+The figure below shows the agent's average achieved over game quadratic score,<a href="https://www.codecogs.com/eqnedit.php?latex=\Xi" target="_blank"><img src="https://latex.codecogs.com/gif.latex?\Xi" title="\Xi" /></a> , for the different deck multiples and policy iteration methods.
+<br>
 <img src ="https://github.com/akinolawilson/Reinforcement-Learning-in-Blackjack/blob/master/optimalScore1to10games.png?raw=true">
 
 ## File Details 
