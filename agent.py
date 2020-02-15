@@ -4,10 +4,9 @@ import random
 class AgentDecisionProcess:
     
     #  QTable will be updated during game play. Holds Q values for all visited states 
-    # and asccoiated actions.
+    # and associated actions.
     QList = []
 
-    #gamma = 0 
     def __init__(self,
                  initialDeckSize,
                  deck,
@@ -122,7 +121,7 @@ class AgentDecisionProcess:
         for trajectory in range(len(cls.QList)):
             for attemptedStateAction in range(len(cls.QList[trajectory])):
                 trajectoryComponent = cls.QList[trajectory][attemptedStateAction] # and stateAction value  
-                #stateActionCount = attemptedStateAction + 1
+                
             
                 alpha = 1 / (attemptedStateAction + 1)           
                 if policySearchMethod in ["QL","TD","SARSA"]:
