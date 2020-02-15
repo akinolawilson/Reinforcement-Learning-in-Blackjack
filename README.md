@@ -8,19 +8,19 @@ This repository contains the class of an agent whom is trained in a simplified B
 by the dealing class. The training of the agent is conducted using three different policy iteration approaches:
 * Q-Learning (QL) 
 * State action reward state action (SARSA)
-* Temperoal Difference (TD) 
+* Tempoal Difference (TD) 
 <br>
 The results of training for 10000 games, with a split of 5000 games of exploration and 5000 of exploitation, over each policy iteration method is presented below. 
 <br>
 <img src = "https://github.com/akinolawilson/Reinforcement-Learning-in-Blackjack/blob/master/winLossDraw.png?raw=true">
 <br>
-Averaging over each policy search method and multiples of the standard deck trained upon, the agent optimised their decision process to achieve a win, draw and loss rate of 48.37,  33.21  and 20.91 percent respectively in terms of dealer-agent interations.
+Averaging over each policy search method and multiples of the standard deck trained upon, the agent optimised their decision process to achieve a win, draw and loss rate of 48.37,  33.21  and 20.91 percent respectively in terms of dealer-agent interactions.
 
 ## Environment Details 
 ________________________________________________________________________________________________________________________________________
 
 The game play is simplified in the sense that the dealer will not attempt to draw any more cards after 
-the initial two at the start of each round . The agent is then trained to achieved the highest in round score, <a href="https://www.codecogs.com/eqnedit.php?latex=\xi" target="_blank"><img src="https://latex.codecogs.com/gif.latex?\xi" title="\xi" /></a>, is determined as 
+the initial two at the start of each round. The agent is then trained to achieved the highest in round score, <a href="https://www.codecogs.com/eqnedit.php?latex=\xi" target="_blank"><img src="https://latex.codecogs.com/gif.latex?\xi" title="\xi" /></a>, is determined as 
 <br>
 <a href="https://www.codecogs.com/eqnedit.php?latex=\xi&space;=&space;\big(&space;\sum&space;c_{i}&space;\big)^2" target="_blank"><img src="https://latex.codecogs.com/gif.latex?\xi&space;=&space;\big(&space;\sum&space;c_{i}&space;\big)^2" title="\xi = \big( \sum c_{i} \big)^2" /></a>.
 <br>
@@ -61,7 +61,7 @@ action and the updating of the Q values for a given policy search method.
 This script contain the class of the Blackjack game play. The actions taken by the agent 
 interact with an instance of this class in a self-perpetuating manner; you only need to call
 the newRound method to begin the game play. All other aspects of the game play; score, ace count etc,
-will be determined from the agent's actions and the class atributes update as a consequence.   
+will be determined from the agent's actions and the class  attributes update as a consequence.   
 
 ```training.py```:
 <br>
@@ -88,5 +88,5 @@ file and place it in the working directory when attempted to run the ```validati
 ### Further Development and Reading
 ________________________________________________________________________________________________________________________________________
 
-The next task is to separate the dealer from the dealing class into its own class. This will allow implementing dealer actions. Furthermore, there is a clear necessity to find ways to reduced the QTables. For a formal review of this project please find my
+The next task is to separate the dealer from the dealing class into its own class. This will allow implementing dealer actions. Furthermore, there is a clear necessity to find ways to reduce the Q Tables. For a formal review of this project please find my
 <a href="https://www.researchgate.net/publication/338992214_Blackjack_Reinforcement_Learning_Approaches_to_an_Incomplete_Information_Game">ResearchGate</a> account. 
